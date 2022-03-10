@@ -102,7 +102,7 @@ let createNewUser = (data) => {
       if (check) {
         resolve({
           errCode: 1,
-          message: `Your's Email isn't exist in our system, plz try other email`,
+          errMessage: `Your's Email isn't exist in our system, plz try other email`,
         });
       } else {
         let hashPassWordFromBcrypt = await hashUserPassword(data.password);
@@ -118,7 +118,7 @@ let createNewUser = (data) => {
         });
         resolve({
           errCode: 0,
-          message: "OK",
+          errMessage: "OK",
         });
       }
     } catch (e) {
@@ -149,7 +149,7 @@ let updateUserData = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!data.id) {
-        resolve({ errCode: 2, message: "Missing required parameter" });
+        resolve({ errCode: 2, errMessage: "Missing required parameter" });
       }
       let user = await db.User.findOne({
         where: { id: data.id },
@@ -165,9 +165,9 @@ let updateUserData = (data) => {
         //   lastName: data.lastName,
         //   address: data.address,
         // });
-        resolve({ errCode: 0, message: "Update user successfully" });
+        resolve({ errCode: 0, errMessage: "Update user successfully" });
       } else {
-        resolve({ errCode: 1, message: "The user not found" });
+        resolve({ errCode: 1, errMessage: "The user not found" });
       }
     } catch (error) {
       reject(error);
