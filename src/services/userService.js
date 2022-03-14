@@ -149,7 +149,7 @@ let deleteUser = (userId) => {
 let updateUserData = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!data.id) {
+      if (!data.id || !data.positionId || !data.gender || !data.roleId) {
         resolve({ errCode: 2, errMessage: "Missing required parameter" });
       }
       let user = await db.User.findOne({
@@ -160,6 +160,10 @@ let updateUserData = (data) => {
         user.firstName = data.firstName;
         user.lastName = data.lastName;
         user.address = data.address;
+        user.phoneNumber = data.phoneNumber;
+        user.positionId = data.positionId;
+        user.gender = data.gender;
+        user.roleId = data.roleId;
         await user.save();
         // await db.User.save({
         //   firstName: data.firstName,
