@@ -95,9 +95,50 @@ let saveInfoDoctorsService = (inputData) => {
     }
   });
 };
+
+let getDetailDoctorByIdService = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter !",
+        });
+      } else {
+        let data = await db.User.findOne({
+          where: { id: id },
+          attributes: {
+            exclude: ["password", "image"],
+          },
+          include: [
+            {
+              model: db.Markdown,
+              attributes: ["contentHTML", "contentMarkdown", "description"],
+            },
+            {
+              model: db.Allcode,
+              as: "positionData",
+              attributes: ["valueEn", "valueVi"],
+            },
+          ],
+          raw: true,
+          nest: true,
+        });
+        resolve({
+          errCode: 0,
+          data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getTopDoctorHomeService,
   getAllDoctorsService,
   saveInfoDoctorsService,
+  getDetailDoctorByIdService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js
