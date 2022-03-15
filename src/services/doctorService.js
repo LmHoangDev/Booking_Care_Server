@@ -72,19 +72,34 @@ let saveInfoDoctorsService = (inputData) => {
       if (
         !inputData.doctorId ||
         !inputData.contentHTML ||
-        !inputData.contentMarkdown
+        !inputData.contentMarkdown ||
+        !inputData.action
       ) {
         reject({
           errCode: 1,
           errMessage: "Missing required parameters",
         });
       } else {
-        await db.Markdown.create({
-          contentMarkdown: inputData.contentMarkdown,
-          contentHTML: inputData.contentHTML,
-          description: inputData.description,
-          doctorId: inputData.doctorId,
-        });
+        if (inputData.action === "CREATE") {
+          await db.Markdown.create({
+            contentMarkdown: inputData.contentMarkdown,
+            contentHTML: inputData.contentHTML,
+            description: inputData.description,
+            doctorId: inputData.doctorId,
+          });
+        } else if (inputData.action === "EDIT") {
+          let doctorMarkDown = await db.Markdown.findOne({
+            where: { doctorId: inputData.doctorId },
+            raw: false,
+          });
+          if (doctorMarkDown) {
+            doctorMarkDown.contentHTML = inputData.contentHTML;
+            doctorMarkDown.contentMarkdown = inputData.contentMarkdown;
+            doctorMarkDown.description = inputData.description;
+            doctorMarkDown.updatedAt = new Date();
+            await doctorMarkDown.save();
+          }
+        }
         resolve({
           errCode: 0,
           errMessage: "Save information doctor successfully",
@@ -125,7 +140,7 @@ let getDetailDoctorByIdService = (id) => {
           nest: true,
         });
         if (data && data.image) {
-          data.image = new Buffer(data.image, "base64").toString("binary");
+          data.image = Buffer.from(data.image, "base64").toString("binary");
         }
         if (!data) {
           data = {};
