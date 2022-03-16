@@ -4,7 +4,7 @@ import CRUDService from "../services/CRUDService";
 let getHomePage = async (req, res) => {
   try {
     let data = await db.User.findAll();
-    console.log(data);
+    // console.log(data);
     return res.render("homepage.ejs", { data: JSON.stringify(data) });
   } catch (error) {
     console.log(error);
@@ -15,7 +15,7 @@ let getCRUD = (req, res) => {
 };
 let postCRUD = async (req, res) => {
   let message = await CRUDService.createNewUser(req.body);
-  console.log(message);
+  // console.log(message);
   return res.redirect("/users");
 };
 let displayGetCRUD = async (req, res) => {
