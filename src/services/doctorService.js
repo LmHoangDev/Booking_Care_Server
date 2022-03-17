@@ -72,17 +72,25 @@ let getAllDoctorsService = () => {
 let saveInfoDoctorsService = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
+      console.log("data", inputData);
       if (
         !inputData.doctorId ||
         !inputData.contentHTML ||
         !inputData.contentMarkdown ||
-        !inputData.action
+        !inputData.action ||
+        !inputData.selectedPrice ||
+        !inputData.selectedPayment ||
+        !inputData.addressClinic ||
+        !inputData.nameClinic ||
+        !inputData.selectedProvince ||
+        !inputData.note
       ) {
         reject({
           errCode: 1,
           errMessage: "Missing required parameters",
         });
       } else {
+        //upsert to markdown
         if (inputData.action === "CREATE") {
           await db.Markdown.create({
             contentMarkdown: inputData.contentMarkdown,
@@ -103,6 +111,39 @@ let saveInfoDoctorsService = (inputData) => {
             await doctorMarkDown.save();
           }
         }
+
+        //upsert to doctor_info=
+        let doctorInfor = await db.Doctor_infor.findOne({
+          where: {
+            doctorId: inputData.doctorId,
+          },
+          raw: false,
+        });
+
+        if (doctorInfor) {
+          //update
+          doctorInfor.doctorId = inputData.doctorId;
+          doctorInfor.priceId = inputData.selectedPrice;
+          doctorInfor.paymentId = inputData.selectedPayment;
+          doctorInfor.provinceId = inputData.selectedProvince;
+          doctorInfor.addressClinic = inputData.addressClinic;
+          doctorInfor.nameClinic = inputData.nameClinic;
+          doctorInfor.note = inputData.note;
+
+          await doctorInfor.save();
+        } else {
+          //create
+          await db.Doctor_infor.create({
+            doctorId: inputData.doctorId,
+            provinceId: inputData.selectedProvince,
+            priceId: inputData.selectedPrice,
+            paymentId: inputData.selectedPayment,
+            addressClinic: inputData.addressClinic,
+            nameClinic: inputData.nameClinic,
+            note: inputData.note,
+          });
+        }
+
         resolve({
           errCode: 0,
           errMessage: "Save information doctor successfully",
