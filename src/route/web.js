@@ -30,6 +30,10 @@ let initWebRouters = (app) => {
     doctorController.getDetailDoctorById
   ); //api/get-detail-
   router.post("/api/bulk-create-schedule", doctorController.bulkCreateSchedule); //api/bulk-create-schedule// tao lich kham
+  router.get(
+    "/api/get-schedule-doctor-by-date",
+    doctorController.getScheduleDoctorByDate
+  );
   return app.use("/", router);
 };
 

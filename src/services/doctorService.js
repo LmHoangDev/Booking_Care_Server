@@ -182,17 +182,9 @@ let bulkCreateScheduleService = (data) => {
           raw: true,
         });
 
-        //convert date
-        if (existing && existing.length > 0) {
-          existing = existing.map((item, index) => {
-            item.date = new Date(item.date).getTime();
-            return item;
-          });
-        }
-
         //Compare different
         let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-          return a.timeType === b.timeType && a.date === b.date;
+          return a.timeType === b.timeType && +a.date === +b.date;
         });
 
         //create data
@@ -210,11 +202,44 @@ let bulkCreateScheduleService = (data) => {
     }
   });
 };
+let getScheduleDoctorByDateService = (doctorId, date) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!doctorId || !date) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameters !",
+        });
+      } else {
+        let dataSchedule = await db.Schedule.findAll({
+          where: { doctorId: doctorId, date: date },
+          include: [
+            {
+              model: db.Allcode,
+              as: "timeTypeData",
+              attributes: ["valueEn", "valueVi"],
+            },
+          ],
+          raw: false,
+          nest: true,
+        });
+        if (!dataSchedule) dataSchedule = [];
+        resolve({
+          errCode: 0,
+          data: dataSchedule,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   getTopDoctorHomeService,
   getAllDoctorsService,
   saveInfoDoctorsService,
   getDetailDoctorByIdService,
   bulkCreateScheduleService,
+  getScheduleDoctorByDateService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js
