@@ -298,6 +298,49 @@ let getScheduleDoctorByDateService = (doctorId, date) => {
     }
   });
 };
+
+let getExtraInforDoctorByIdService = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id)
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter !",
+        });
+      let data = await db.Doctor_infor.findOne({
+        where: {
+          doctorId: id,
+        },
+        attributes: {
+          exclude: ["id", "doctorId"],
+        },
+        include: [
+          {
+            model: db.Allcode,
+            as: "priceTypeData",
+            attributes: ["valueEn", "valueVi"],
+          },
+          {
+            model: db.Allcode,
+            as: "provinceTypeData",
+            attributes: ["valueEn", "valueVi"],
+          },
+          {
+            model: db.Allcode,
+            as: "paymentTypeData",
+            attributes: ["valueEn", "valueVi"],
+          },
+        ],
+        raw: false,
+        nest: true,
+      });
+      if (!data) data = {};
+      resolve({ errCode: 0, data });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   getTopDoctorHomeService,
   getAllDoctorsService,
@@ -305,5 +348,6 @@ module.exports = {
   getDetailDoctorByIdService,
   bulkCreateScheduleService,
   getScheduleDoctorByDateService,
+  getExtraInforDoctorByIdService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js
