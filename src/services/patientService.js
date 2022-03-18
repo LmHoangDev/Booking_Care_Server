@@ -29,7 +29,7 @@ let postBookingAppointmentService = (data) => {
               statusId: "S1",
               doctorId: data.doctorId,
               patientId: user[0].id,
-              date: data.timeType,
+              date: data.date,
               timeType: data.timeType,
             },
           });
