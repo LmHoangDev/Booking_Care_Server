@@ -341,6 +341,70 @@ let getExtraInforDoctorByIdService = (id) => {
     }
   });
 };
+
+let getProfileDoctorByIdService = (doctorId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!doctorId)
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter !",
+        });
+      let data = await db.User.findOne({
+        where: {
+          id: doctorId,
+        },
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: db.Markdown,
+            attributes: ["contentHTML", "contentMarkdown", "description"],
+          },
+          {
+            model: db.Allcode,
+            as: "positionData",
+            attributes: ["valueEn", "valueVi"],
+          },
+          {
+            model: db.Doctor_infor,
+            attributes: {
+              exclude: ["id", "doctorId"],
+            },
+            include: [
+              {
+                model: db.Allcode,
+                as: "priceTypeData",
+                attributes: ["valueEn", "valueVi"],
+              },
+              {
+                model: db.Allcode,
+                as: "provinceTypeData",
+                attributes: ["valueEn", "valueVi"],
+              },
+              {
+                model: db.Allcode,
+                as: "paymentTypeData",
+                attributes: ["valueEn", "valueVi"],
+              },
+            ],
+          },
+        ],
+        raw: false,
+        nest: true,
+      });
+      if (!data) data = {};
+      if (data && data.image) {
+        data.image = Buffer.from(data.image, "base64").toString();
+      }
+      resolve({ errCode: 0, data });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getTopDoctorHomeService,
   getAllDoctorsService,
@@ -349,5 +413,6 @@ module.exports = {
   bulkCreateScheduleService,
   getScheduleDoctorByDateService,
   getExtraInforDoctorByIdService,
+  getProfileDoctorByIdService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js
