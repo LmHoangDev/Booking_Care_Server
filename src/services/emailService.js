@@ -2,7 +2,7 @@ require("dotenv").config();
 import nodemailer from "nodemailer";
 let sendSimpleEmail = async (dataSend) => {
   // create reusable transporter object using the default SMTP transport
-  console.log("dataSend: ", dataSend);
+
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -25,12 +25,12 @@ let sendSimpleEmail = async (dataSend) => {
     html: getBodyEmailHTML(dataSend), // html body
   });
 };
-getBodyEmailHTML = (dataSend) => {
+let getBodyEmailHTML = (dataSend) => {
   if (dataSend.language === "vi") {
     return `<h2>Xin chào ${dataSend.patientName}</h2><p>Bạn nhận được email này vì đã đặt lịch khám bệnh online trên BookingCare.vn</p><p>Thông tin đặt lịch khám bệnh:</p><div>
         <b>Thời gian: ${dataSend.time}</b>
       </div><div><b>Bác sĩ: ${dataSend.doctorName}</b></div>
-      <p>Vui lòng kiểm tra thông tin và xác nhận, vui lòng click vào link bên dưới để hoang tất thủ tục đặt lịch khám bênh.</p><div>
+      <p>Vui lòng kiểm tra thông tin và xác nhận, vui lòng click vào link bên dưới để hoàn tất thủ tục đặt lịch khám bệnh.</p><div>
         <a href=${dataSend.Url} target="_blank">Click here</a>
       </div>`;
   }
