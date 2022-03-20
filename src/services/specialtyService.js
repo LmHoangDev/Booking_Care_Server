@@ -34,4 +34,43 @@ let postCreateNewSpecialtyService = (data) => {
   });
 };
 
-module.exports = { postCreateNewSpecialtyService };
+let getListSpecialtyService = (limit) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let data = [];
+      if (!limit) {
+        data = await db.Specialty.findAll({
+          raw: true,
+          nest: true,
+        });
+      } else {
+        data = await db.Specialty.findAll({
+          limit: limit,
+          raw: true,
+          nest: true,
+        });
+      }
+
+      if (data && data.length > 0) {
+        data = data.map((item, index) => {
+          item.image = Buffer.from(item.image, "base64").toString("binary");
+          return item;
+        });
+        resolve({
+          errCode: 0,
+          errMessage: "Ok",
+          data: data,
+        });
+      }
+      resolve({
+        errCode: 0,
+        errMessage: "Ok",
+        data: [],
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+module.exports = { postCreateNewSpecialtyService, getListSpecialtyService };
