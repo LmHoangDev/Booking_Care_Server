@@ -73,7 +73,7 @@ let getAllDoctorsService = () => {
 let saveInfoDoctorsService = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("data", inputData);
+      // console.log("data", inputData);
       if (
         !inputData.doctorId ||
         !inputData.contentHTML ||
@@ -84,7 +84,8 @@ let saveInfoDoctorsService = (inputData) => {
         !inputData.addressClinic ||
         !inputData.nameClinic ||
         !inputData.selectedProvince ||
-        !inputData.note
+        !inputData.note ||
+        !inputData.selectedSpecialty
       ) {
         reject({
           errCode: 1,
@@ -130,6 +131,8 @@ let saveInfoDoctorsService = (inputData) => {
           doctorInfor.addressClinic = inputData.addressClinic;
           doctorInfor.nameClinic = inputData.nameClinic;
           doctorInfor.note = inputData.note;
+          doctorInfor.specialtyId = inputData.selectedSpecialty;
+          doctorInfor.clinicId = inputData.selectedClinic;
 
           await doctorInfor.save();
         } else {
@@ -142,6 +145,8 @@ let saveInfoDoctorsService = (inputData) => {
             addressClinic: inputData.addressClinic,
             nameClinic: inputData.nameClinic,
             note: inputData.note,
+            specialtyId: inputData.selectedSpecialty,
+            clinicId: inputData.selectedClinic,
           });
         }
 
