@@ -114,7 +114,14 @@ let getListPatientsForDoctor = async (req, res) => {
     console.log(error);
   }
 };
-
+let postSendRemedy = async (req, res) => {
+  try {
+    let response = await doctorService.postSendRemedyService(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   getTopDoctorHome,
   getAllDoctors,
@@ -125,4 +132,5 @@ module.exports = {
   getExtraInforDoctorById,
   getProfileDoctorById,
   getListPatientsForDoctor,
+  postSendRemedy,
 };

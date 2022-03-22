@@ -449,6 +449,11 @@ let getListPatientsForDoctorService = (doctorId, date) => {
                 },
               ],
             },
+            {
+              model: db.Allcode,
+              as: "timeTypeDataPatient",
+              attributes: ["valueVi", "valueEn"],
+            },
           ],
           raw: false,
           nest: true,
@@ -464,6 +469,40 @@ let getListPatientsForDoctorService = (doctorId, date) => {
     }
   });
 };
+
+let postSendRemedyService = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.email || !data.doctorId || !data.patientId || !data.timeType) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        let appointment = await db.Booking.findOne({
+          where: {
+            doctorId: data.doctorId,
+            patientId: data.patientId,
+            timeType: data.timeType,
+            statusId: "S2",
+          },
+          raw: false,
+        });
+        if (appointment) {
+          appointment.statusId = "S3";
+          await appointment.save();
+        }
+        resolve({
+          errCode: 0,
+          errMessage: "Confirm appointment successfully!",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getTopDoctorHomeService,
   getAllDoctorsService,
@@ -474,5 +513,6 @@ module.exports = {
   getExtraInforDoctorByIdService,
   getProfileDoctorByIdService,
   getListPatientsForDoctorService,
+  postSendRemedyService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js
