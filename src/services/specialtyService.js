@@ -73,4 +73,47 @@ let getListSpecialtyService = (limit) => {
   });
 };
 
-module.exports = { postCreateNewSpecialtyService, getListSpecialtyService };
+let getDetailSpecialtyByIdLocationService = (id, location) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id || !location) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      }
+      let data = await db.Specialty.findOne({
+        where: { id: id },
+        attributes: ["descriptionHTML", "descriptionMarkdown"],
+      });
+      if (data) {
+        let listDoctor = [];
+        if (location === "ALL") {
+          listDoctor = await db.Doctor_infor.findAll({
+            where: { specialtyId: id },
+            attributes: ["doctorId", "provinceId"],
+          });
+        } else {
+          listDoctor = await db.Doctor_infor.findAll({
+            where: { specialtyId: id, provinceId: location },
+            attributes: ["doctorId", "provinceId"],
+          });
+        }
+        data.listDoctor = listDoctor;
+      }
+      resolve({
+        errCode: 0,
+        errMessage: "OK",
+        data,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+module.exports = {
+  postCreateNewSpecialtyService,
+  getListSpecialtyService,
+  getDetailSpecialtyByIdLocationService,
+};

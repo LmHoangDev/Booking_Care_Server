@@ -66,6 +66,12 @@ let initWebRouters = (app) => {
   );
   router.get("/api/get-list-specialty", specialtyController.getListSpecialty);
 
+  //get-detail-specialty-by-id-by-location
+  router.get(
+    "/api/get-detail-specialty-by-id-location",
+    specialtyController.getDetailSpecialtyByIdLocation
+  );
+
   return app.use("/", router);
 };
 
