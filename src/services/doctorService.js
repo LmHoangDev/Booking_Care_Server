@@ -415,7 +415,55 @@ let getProfileDoctorByIdService = (doctorId) => {
     }
   });
 };
-
+let getListPatientsForDoctorService = (doctorId, date) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!doctorId || !date) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        let data = await db.Booking.findAll({
+          where: {
+            statusId: "S2",
+            doctorId: doctorId,
+            date: date,
+          },
+          include: [
+            {
+              model: db.User,
+              as: "patientData",
+              attributes: [
+                "email",
+                "firstName",
+                "gender",
+                "address",
+                "phoneNumber",
+              ],
+              include: [
+                {
+                  model: db.Allcode,
+                  as: "genderData",
+                  attributes: ["valueVi", "valueEn"],
+                },
+              ],
+            },
+          ],
+          raw: false,
+          nest: true,
+        });
+        resolve({
+          errCode: 0,
+          errMessage: "Ok",
+          data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   getTopDoctorHomeService,
   getAllDoctorsService,
@@ -425,5 +473,6 @@ module.exports = {
   getScheduleDoctorByDateService,
   getExtraInforDoctorByIdService,
   getProfileDoctorByIdService,
+  getListPatientsForDoctorService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js

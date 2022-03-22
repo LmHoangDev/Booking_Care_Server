@@ -19,7 +19,10 @@ let postBookingAppointmentService = (data) => {
         !data.date ||
         !data.fullName ||
         !data.doctorName ||
-        !data.timeString
+        !data.timeString ||
+        !data.selectedGender ||
+        !data.address ||
+        !data.phoneNumber
       ) {
         resolve({
           errCode: 1,
@@ -43,6 +46,10 @@ let postBookingAppointmentService = (data) => {
           defaults: {
             email: data.email,
             roleId: "R3",
+            gender: data.selectedGender,
+            address: data.address,
+            firstName: data.fullName,
+            phoneNumber: data.phoneNumber,
           },
         });
         if (user && user[0]) {
