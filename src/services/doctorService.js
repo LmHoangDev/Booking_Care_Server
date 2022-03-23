@@ -1,6 +1,7 @@
 import db from "../models/index";
 require("dotenv").config();
 import _ from "lodash";
+import { sendEmailAttachment } from "./emailService";
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 let getTopDoctorHomeService = (limit) => {
@@ -491,6 +492,7 @@ let postSendRemedyService = (data) => {
         if (appointment) {
           appointment.statusId = "S3";
           await appointment.save();
+          await sendEmailAttachment(data);
         }
         resolve({
           errCode: 0,
