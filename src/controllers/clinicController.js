@@ -26,5 +26,16 @@ let getDetailClinicById = async (req, res) => {
     console.log(error);
   }
 };
-
-module.exports = { postCreateNewClinic, getAllClinic, getDetailClinicById };
+let deleteClinicById = async (req, res) => {
+  try {
+    let response = await clinicService.deleteClinicByIdService(+req.body.id);
+  } catch (error) {
+    console.log(error);
+  }
+};
+module.exports = {
+  postCreateNewClinic,
+  getAllClinic,
+  getDetailClinicById,
+  deleteClinicById,
+};

@@ -94,8 +94,39 @@ let getDetailClinicByIdService = (id) => {
     }
   });
 };
+let deleteClinicByIdService = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      }
+      let data = await db.Clinic.destroy({
+        where: {
+          id: id,
+        },
+      });
+      if (data) {
+        resolve({
+          errCode: 0,
+          errMessage: "Delete clinic successfully",
+        });
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "Not found Clinic",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   postCreateNewClinicService,
   getAllClinicService,
   getDetailClinicByIdService,
+  deleteClinicByIdService,
 };
