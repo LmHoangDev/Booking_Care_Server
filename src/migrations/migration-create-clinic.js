@@ -23,7 +23,10 @@ module.exports = {
       image: {
         type: Sequelize.BLOB("long"),
       },
-
+      isDeleted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

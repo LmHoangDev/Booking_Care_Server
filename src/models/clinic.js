@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       descriptionMarkdown: DataTypes.TEXT,
       descriptionHTML: DataTypes.TEXT,
       image: DataTypes.TEXT,
+      isDeleted: DataTypes.BOOLEAN,
     },
     {
       sequelize,

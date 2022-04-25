@@ -103,12 +103,13 @@ let deleteClinicByIdService = (id) => {
           errMessage: "Missing required parameter",
         });
       }
-      let data = await db.Clinic.destroy({
-        where: {
-          id: id,
-        },
+      let data = await db.Clinic.findOne({
+        where: { id: id },
+        raw: false,
       });
       if (data) {
+        data.isDeleted = true;
+        await data.save();
         resolve({
           errCode: 0,
           errMessage: "Delete clinic successfully",
