@@ -16,18 +16,19 @@ let postCreateNewClinicService = (data) => {
           errCode: 1,
           errMessage: "Missing required parameter",
         });
+      } else {
+        await db.Clinic.create({
+          name: data.name,
+          address: data.address,
+          descriptionHTML: data.descriptionHTML,
+          descriptionMarkdown: data.descriptionMarkdown,
+          image: data.imageBase64,
+        });
+        resolve({
+          errCode: 0,
+          errMessage: "Create clinic successfully",
+        });
       }
-      await db.Clinic.create({
-        name: data.name,
-        address: data.address,
-        descriptionHTML: data.descriptionHTML,
-        descriptionMarkdown: data.descriptionMarkdown,
-        image: data.imageBase64,
-      });
-      resolve({
-        errCode: 0,
-        errMessage: "Create clinic successfully",
-      });
     } catch (error) {
       reject(error);
     }
