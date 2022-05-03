@@ -1,6 +1,29 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs";
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 const salt = bcrypt.genSaltSync(10);
+
+let generateAccessToken = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      roleId: user.roleId,
+    },
+    process.env.JWT_ACCESS_KEY,
+    { expiresIn: "30s" }
+  );
+};
+let generateRefreshTokenToken = (user) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      roleId: user.roleId,
+    },
+    process.env.JWT_REFRESH_KEY,
+    { expiresIn: "365d" }
+  );
+};
 let handleUserLogin = (email, password) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -29,7 +52,16 @@ let handleUserLogin = (email, password) => {
           if (check) {
             userData.errCode = 0;
             userData.errMessage = "OK";
-
+            const accessToken = generateAccessToken(user);
+            const refreshToken = generateRefreshToken(user);
+            userData.accessToken = accessToken;
+            userData.refreshToken = refreshToken;
+            res.cookie("refresherToken", refreshToken, {
+              httpOnly: true,
+              secure: false,
+              path: "/",
+              sameSite: "strict",
+            });
             delete user.password;
             userData.user = user;
           } else {
@@ -45,6 +77,7 @@ let handleUserLogin = (email, password) => {
         userData.errCode = 1;
         userData.errMessage = `Your's Email isn't exist in our system, plz try other email`;
       }
+      console.log(userData);
       resolve(userData);
     } catch (e) {
       reject(e);
@@ -79,7 +112,7 @@ let getAllUsers = (userId) => {
       if (userId && userId !== "ALL") {
         users = await db.User.findOne({
           attributes: { exclude: ["password"] },
-          where: { id: 5 },
+          where: { id: userId },
         });
       }
       resolve(users);

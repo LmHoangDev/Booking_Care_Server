@@ -6,6 +6,8 @@ import patientController from "../controllers/patientController";
 import specialtyController from "../controllers/specialtyController";
 import clinicController from "../controllers/clinicController";
 import postController from "../controllers/postController";
+import authController from "../controllers/authController";
+import middlewareController from "../controllers/middlewareController";
 let router = express.Router();
 
 let initWebRouters = (app) => {
@@ -17,12 +19,20 @@ let initWebRouters = (app) => {
   router.post("/put-crud", homeController.putCRUD);
   router.get("/delete-crud", homeController.deleteCRUD);
 
-  //api
+  //api/userController
   router.post("/api/login", userController.handleLogin);
-  router.get("/api/get-all-users", userController.handleGetAllUsers);
+  router.get(
+    "/api/get-all-users",
+    middlewareController.verifyToken,
+    userController.handleGetAllUsers
+  );
   router.post("/api/create-new-user", userController.handleCreateNewUser);
   router.put("/api/edit-user", userController.handleEditUser);
-  router.delete("/api/delete-user", userController.handleDeleteUser);
+  router.delete(
+    "/api/delete-user",
+    middlewareController.verifyTokenAndAdminAuth,
+    userController.handleDeleteUser
+  );
 
   router.get("/api/allcode", userController.getAllCode);
 
@@ -96,6 +106,10 @@ let initWebRouters = (app) => {
   router.post("/api/create-new-post", postController.createNewPost);
   router.post("/api/delete-post-by-id", postController.deletePostById);
   router.post("/api/update-post", postController.updatePostById);
+
+  //authController
+
+  router.post("/api/auth/register", authController.registerUser);
 
   return app.use("/", router);
 };
