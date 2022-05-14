@@ -17,11 +17,7 @@ let handleLogin = async (req, res) => {
   //return userInfor
   // access_token :JWT json web token
 
-  return res.status(200).json({
-    errCode: userData.errCode,
-    message: userData.errMessage,
-    user: userData.user ? userData.user : {},
-  });
+  return res.status(200).json(userData);
 };
 let handleGetAllUsers = async (req, res) => {
   let id = req.query.id;
@@ -74,6 +70,14 @@ let getAllCode = async (req, res) => {
     });
   }
 };
+let userLogout = async (req, res) => {
+  await userService.userLogout();
+  res.status(200).json("Logout successfully");
+};
+let refreshToken = async (req, res) => {
+  await userService.refreshToken();
+  res.status(200).json("Refresh token successfully");
+};
 module.exports = {
   handleLogin: handleLogin,
   handleGetAllUsers,
@@ -81,4 +85,6 @@ module.exports = {
   handleEditUser,
   handleDeleteUser,
   getAllCode,
+  userLogout,
+  refreshToken,
 };

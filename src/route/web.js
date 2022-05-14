@@ -23,14 +23,14 @@ let initWebRouters = (app) => {
   router.post("/api/login", userController.handleLogin);
   router.get(
     "/api/get-all-users",
-    middlewareController.verifyToken,
+    // middlewareController.verifyToken,
     userController.handleGetAllUsers
   );
   router.post("/api/create-new-user", userController.handleCreateNewUser);
   router.put("/api/edit-user", userController.handleEditUser);
   router.delete(
     "/api/delete-user",
-    middlewareController.verifyTokenAndAdminAuth,
+    // middlewareController.verifyTokenAndAdminAuth,
     userController.handleDeleteUser
   );
 
@@ -110,7 +110,16 @@ let initWebRouters = (app) => {
   //authController
 
   router.post("/api/auth/register", authController.registerUser);
-
+  router.post("/api/refresherToken", function (req, res) {
+    userController.refresherToken;
+  });
+  router.post(
+    "/api/logout",
+    middlewareController.verifyToken,
+    function (req, res) {
+      userController.userLogout;
+    }
+  );
   return app.use("/", router);
 };
 

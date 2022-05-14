@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const salt = bcrypt.genSaltSync(10);
 
+let refreshTokens = [];
 let generateAccessToken = (user) => {
   return jwt.sign(
     {
@@ -14,7 +15,7 @@ let generateAccessToken = (user) => {
     { expiresIn: "30s" }
   );
 };
-let generateRefreshTokenToken = (user) => {
+let generateRefreshToken = (user) => {
   return jwt.sign(
     {
       id: user.id,
@@ -52,16 +53,20 @@ let handleUserLogin = (email, password) => {
           if (check) {
             userData.errCode = 0;
             userData.errMessage = "OK";
-            const accessToken = generateAccessToken(user);
-            const refreshToken = generateRefreshToken(user);
-            userData.accessToken = accessToken;
-            userData.refreshToken = refreshToken;
-            res.cookie("refresherToken", refreshToken, {
-              httpOnly: true,
-              secure: false,
-              path: "/",
-              sameSite: "strict",
-            });
+            let acc = generateAccessToken(user);
+            let refresh = generateRefreshToken(user);
+            userData.accessToken = acc;
+            userData.refreshToken = refresh;
+            generateRefreshToken(user);
+            refreshTokens.push(acc);
+            // resolve(function (req, res) {
+            //   return res.cookie("refresherToken", refresh, {
+            //     httpOnly: true,
+            //     secure: false,
+            //     path: "/",
+            //     sameSite: "strict",
+            //   });
+            // });
             delete user.password;
             userData.user = user;
           } else {
@@ -77,7 +82,6 @@ let handleUserLogin = (email, password) => {
         userData.errCode = 1;
         userData.errMessage = `Your's Email isn't exist in our system, plz try other email`;
       }
-      console.log(userData);
       resolve(userData);
     } catch (e) {
       reject(e);
@@ -246,6 +250,42 @@ let getAllCodeService = (typeInput) => {
     }
   });
 };
+let refresherToken = async (req, res) => {
+  const refresherToken = req.cookies.refresherToken;
+  if (!refresherToken) {
+    return res.status(401).json("You're not authenticated!");
+  }
+  if (!refreshTokens.includes(refresherToken)) {
+    return res.status(403).json("Refresh token is invalid!");
+  }
+  jwt.verify(refresherToken, process.env.JWT_REFRESH_KEY, (err, user) => {
+    if (err) {
+      console.log(err);
+    }
+    refreshTokens = refreshTokens.filter((item) => item !== refresherToken);
+    //create new access_token,refreshToken
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+    refreshTokens.push(newRefreshToken);
+    res.cookie("refresherToken", newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      path: "/",
+      sameSite: "strict",
+    });
+    res.status(200).json({ accessToken: newAccessToken });
+  });
+};
+let userLogout = () => {
+  return new Promise(async (req, res) => {
+    res.clearCookie("refresherToken");
+    refreshTokens = refreshTokens.filter(
+      (item) => item !== req.cookies.refresherToken
+    );
+    res.status(200).json("Log out successfully!");
+  });
+};
+
 module.exports = {
   handleUserLogin: handleUserLogin,
   checkUserEmail: checkUserEmail,
@@ -254,5 +294,7 @@ module.exports = {
   deleteUser,
   updateUserData,
   getAllCodeService,
+  refresherToken,
+  userLogout,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js
