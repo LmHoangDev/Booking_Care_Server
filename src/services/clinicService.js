@@ -126,9 +126,50 @@ let deleteClinicByIdService = (id) => {
     }
   });
 };
+let updateClinicService = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (
+        !data.id ||
+        !data.name ||
+        !data.address ||
+        !data.descriptionMarkdown ||
+        !data.descriptionHTML
+      ) {
+        resolve({ errCode: 2, errMessage: "Missing required parameter" });
+      }
+      let clinic = await db.Clinic.findOne({
+        where: { id: data.id },
+        raw: false,
+      });
+      if (clinic) {
+        clinic.name = data.name;
+        clinic.address = data.address;
+        clinic.descriptionHTML = data.descriptionHTML;
+        clinic.descriptionMarkdown = data.descriptionMarkdown;
+        if (data.image) {
+          clinic.image = data.image;
+        }
+
+        await clinic.save();
+        // await db.clinic.save({
+        //   firstName: data.firstName,
+        //   lastName: data.lastName,
+        //   address: data.address,
+        // });
+        resolve({ errCode: 0, errMessage: "Update clinic successfully" });
+      } else {
+        resolve({ errCode: 1, errMessage: "The clinic not found" });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   postCreateNewClinicService,
   getAllClinicService,
   getDetailClinicByIdService,
   deleteClinicByIdService,
+  updateClinicService,
 };

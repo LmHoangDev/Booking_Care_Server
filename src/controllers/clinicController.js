@@ -33,9 +33,16 @@ let deleteClinicById = async (req, res) => {
     console.log(error);
   }
 };
+let handleEditClinic = async (req, res) => {
+  let data = req.body;
+  let message = await clinicService.updateClinicService(data);
+
+  return res.status(200).json({ message });
+};
 module.exports = {
   postCreateNewClinic,
   getAllClinic,
   getDetailClinicById,
   deleteClinicById,
+  handleEditClinic,
 };

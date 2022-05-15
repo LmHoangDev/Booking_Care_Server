@@ -27,7 +27,7 @@ let initWebRouters = (app) => {
     userController.handleGetAllUsers
   );
   router.post("/api/create-new-user", userController.handleCreateNewUser);
-  router.put("/api/edit-user", userController.handleEditUser);
+  router.post("/api/edit-user", userController.handleEditUser);
   router.delete(
     "/api/delete-user",
     // middlewareController.verifyTokenAndAdminAuth,
@@ -85,21 +85,21 @@ let initWebRouters = (app) => {
     specialtyController.postCreateNewSpecialty
   );
   router.get("/api/get-list-specialty", specialtyController.getListSpecialty);
-
+  //get-detail-specialty-by-id-by-location
   router.get(
     "/api/get-detail-specialty-by-id-location",
     specialtyController.getDetailSpecialtyByIdLocation
-  ); //get-detail-specialty-by-id-by-location
+  );
 
   //clinicController
   router.post("/api/create-new-clinic", clinicController.postCreateNewClinic);
   router.get("/api/get-all-clinic", clinicController.getAllClinic);
-
   router.get(
     "/api/get-details-clinic-by-id",
     clinicController.getDetailClinicById
   );
   router.post("/api/delete-clinic-by-id", clinicController.deleteClinicById);
+  router.post("/api/edit-clinic", clinicController.handleEditClinic);
 
   //postController
   router.get("/api/get-all-post", postController.getAllPost);
@@ -120,6 +120,10 @@ let initWebRouters = (app) => {
       userController.userLogout;
     }
   );
+
+  // vo hieu hoa tai khoan hoac mo tai khoan
+  router.post("/api/auth/activeAccount", userController.activeAccount);
+
   return app.use("/", router);
 };
 

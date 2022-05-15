@@ -161,6 +161,7 @@ let createNewUser = (data) => {
           roleId: data.roleId,
           positionId: data.positionId,
           image: data.image,
+          isActive: 0,
         });
         resolve({
           errCode: 0,
@@ -285,7 +286,42 @@ let userLogout = () => {
     res.status(200).json("Log out successfully!");
   });
 };
+let changeActiveAccount = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.id) {
+        resolve({ errCode: 2, errMessage: "Missing required parameter" });
+      }
+      let user = await db.User.findOne({
+        where: { id: data.id },
+        raw: false,
+      });
+      if (user) {
+        let isActive = data.isActive;
+        if (isActive) {
+          user.isActive = true;
+        } else {
+          user.isActive = false;
+        }
 
+        await user.save();
+        // await db.User.save({
+        //   firstName: data.firstName,
+        //   lastName: data.lastName,
+        //   address: data.address,
+        // });
+        resolve({
+          errCode: 0,
+          errMessage: "Change active account successfully",
+        });
+      } else {
+        resolve({ errCode: 1, errMessage: "The user not found" });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   handleUserLogin: handleUserLogin,
   checkUserEmail: checkUserEmail,
@@ -296,5 +332,6 @@ module.exports = {
   getAllCodeService,
   refresherToken,
   userLogout,
+  changeActiveAccount,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js
