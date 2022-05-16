@@ -17,17 +17,19 @@ let postCreateNewSpecialtyService = (data) => {
           errCode: 1,
           errMessage: "Missing required parameter",
         });
+      } else {
+        await db.Specialty.create({
+          name: data.name,
+          descriptionHTML: data.descriptionHTML,
+          descriptionMarkdown: data.descriptionMarkdown,
+          image: data.imageBase64,
+          isDeleted: 0,
+        });
+        resolve({
+          errCode: 0,
+          errMessage: "Create new specialty successfully!!",
+        });
       }
-      await db.Specialty.create({
-        name: data.name,
-        descriptionHTML: data.descriptionHTML,
-        descriptionMarkdown: data.descriptionMarkdown,
-        image: data.imageBase64,
-      });
-      resolve({
-        errCode: 0,
-        errMessage: "Create new specialty successfully!!",
-      });
     } catch (error) {
       reject(error);
     }
@@ -52,9 +54,9 @@ let getListSpecialtyService = (limit) => {
       }
 
       if (data && data.length > 0) {
-        data = data.map((item, index) => {
+        data = data.filter((item, index) => {
           item.image = Buffer.from(item.image, "base64").toString("binary");
-          return item;
+          return item.isDeleted === 0 && item;
         });
         resolve({
           errCode: 0,
@@ -111,9 +113,78 @@ let getDetailSpecialtyByIdLocationService = (id, location) => {
     }
   });
 };
+let updateSpecialtyService = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (
+        !data.id ||
+        !data.name ||
+        !data.image ||
+        !data.descriptionMarkdown ||
+        !data.descriptionHTML
+      ) {
+        resolve({ errCode: 2, errMessage: "Missing required parameter" });
+      } else {
+        let specialty = await db.Specialty.findOne({
+          where: { id: data.id },
+          raw: false,
+        });
+        if (specialty) {
+          specialty.name = data.name;
+          specialty.descriptionHTML = data.descriptionHTML;
+          specialty.descriptionMarkdown = data.descriptionMarkdown;
+          if (data.image) {
+            specialty.image = data.image;
+          }
+          await specialty.save();
+          resolve({ errCode: 0, errMessage: "Update specialty successfully" });
+        } else {
+          resolve({ errCode: 1, errMessage: "The specialty not found" });
+        }
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let deleteSpecialtyByIdService = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      }
+      let data = await db.Specialty.findOne({
+        where: { id: id },
+        raw: false,
+      });
+
+      if (data) {
+        data.isDeleted = true;
+        await data.save();
+        resolve({
+          errCode: 0,
+          errMessage: "Delete specialty successfully",
+        });
+      } else {
+        resolve({
+          errCode: 2,
+          errMessage: "Not found Specialty",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
 module.exports = {
   postCreateNewSpecialtyService,
   getListSpecialtyService,
   getDetailSpecialtyByIdLocationService,
+  updateSpecialtyService,
+  deleteSpecialtyByIdService,
 };

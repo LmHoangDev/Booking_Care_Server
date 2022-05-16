@@ -28,7 +28,8 @@ let getDetailClinicById = async (req, res) => {
 };
 let deleteClinicById = async (req, res) => {
   try {
-    let response = await clinicService.deleteClinicByIdService(+req.body.id);
+    let message = await clinicService.deleteClinicByIdService(+req.body.id);
+    return res.status(200).json({ message });
   } catch (error) {
     console.log(error);
   }

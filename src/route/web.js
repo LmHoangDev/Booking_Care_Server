@@ -90,6 +90,11 @@ let initWebRouters = (app) => {
     "/api/get-detail-specialty-by-id-location",
     specialtyController.getDetailSpecialtyByIdLocation
   );
+  router.post("/api/edit-specialty", specialtyController.handleEditSpecialty);
+  router.post(
+    "/api/delete-specialty-by-id",
+    specialtyController.deleteSpecialtyById
+  );
 
   //clinicController
   router.post("/api/create-new-clinic", clinicController.postCreateNewClinic);

@@ -23,6 +23,7 @@ let postCreateNewClinicService = (data) => {
           descriptionHTML: data.descriptionHTML,
           descriptionMarkdown: data.descriptionMarkdown,
           image: data.imageBase64,
+          isDeleted: 0,
         });
         resolve({
           errCode: 0,
@@ -43,10 +44,11 @@ let getAllClinicService = () => {
       });
 
       if (data && data.length > 0) {
-        data = data.map((item, index) => {
+        data = data.filter((item, index) => {
           item.image = Buffer.from(item.image, "base64").toString("binary");
-          return item;
+          return item.isDeleted === 0 && item;
         });
+
         resolve({
           errCode: 0,
           errMessage: "Ok",
@@ -108,6 +110,7 @@ let deleteClinicByIdService = (id) => {
         where: { id: id },
         raw: false,
       });
+
       if (data) {
         data.isDeleted = true;
         await data.save();
@@ -137,29 +140,30 @@ let updateClinicService = (data) => {
         !data.descriptionHTML
       ) {
         resolve({ errCode: 2, errMessage: "Missing required parameter" });
-      }
-      let clinic = await db.Clinic.findOne({
-        where: { id: data.id },
-        raw: false,
-      });
-      if (clinic) {
-        clinic.name = data.name;
-        clinic.address = data.address;
-        clinic.descriptionHTML = data.descriptionHTML;
-        clinic.descriptionMarkdown = data.descriptionMarkdown;
-        if (data.image) {
-          clinic.image = data.image;
-        }
-
-        await clinic.save();
-        // await db.clinic.save({
-        //   firstName: data.firstName,
-        //   lastName: data.lastName,
-        //   address: data.address,
-        // });
-        resolve({ errCode: 0, errMessage: "Update clinic successfully" });
       } else {
-        resolve({ errCode: 1, errMessage: "The clinic not found" });
+        let clinic = await db.Clinic.findOne({
+          where: { id: data.id },
+          raw: false,
+        });
+        if (clinic) {
+          clinic.name = data.name;
+          clinic.address = data.address;
+          clinic.descriptionHTML = data.descriptionHTML;
+          clinic.descriptionMarkdown = data.descriptionMarkdown;
+          if (data.image) {
+            clinic.image = data.image;
+          }
+
+          await clinic.save();
+          // await db.clinic.save({
+          //   firstName: data.firstName,
+          //   lastName: data.lastName,
+          //   address: data.address,
+          // });
+          resolve({ errCode: 0, errMessage: "Update clinic successfully" });
+        } else {
+          resolve({ errCode: 1, errMessage: "The clinic not found" });
+        }
       }
     } catch (error) {
       reject(error);

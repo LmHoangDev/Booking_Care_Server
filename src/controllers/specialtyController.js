@@ -40,9 +40,26 @@ let getDetailSpecialtyByIdLocation = async (req, res) => {
     });
   }
 };
+let handleEditSpecialty = async (req, res) => {
+  let data = req.body;
+  let message = await specialtyService.updateSpecialtyService(data);
 
+  return res.status(200).json({ message });
+};
+let deleteSpecialtyById = async (req, res) => {
+  try {
+    let message = await specialtyService.deleteSpecialtyByIdService(
+      +req.body.id
+    );
+    return res.status(200).json({ message });
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   postCreateNewSpecialty,
   getListSpecialty,
   getDetailSpecialtyByIdLocation,
+  handleEditSpecialty,
+  deleteSpecialtyById,
 };
