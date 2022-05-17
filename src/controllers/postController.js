@@ -17,8 +17,8 @@ let createNewPost = async (req, res) => {
 };
 let deletePostById = async (req, res) => {
   try {
-    let response = await postService.postDeletePostService(req.body);
-    return res.status(200).json(response);
+    let message = await postService.postDeletePostService(+req.body.id);
+    return res.status(200).json({ message });
   } catch (error) {
     console.log(error);
   }

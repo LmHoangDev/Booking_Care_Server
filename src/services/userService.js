@@ -4,27 +4,27 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const salt = bcrypt.genSaltSync(10);
 
-let refreshTokens = [];
-let generateAccessToken = (user) => {
-  return jwt.sign(
-    {
-      id: user.id,
-      roleId: user.roleId,
-    },
-    process.env.JWT_ACCESS_KEY,
-    { expiresIn: "30s" }
-  );
-};
-let generateRefreshToken = (user) => {
-  return jwt.sign(
-    {
-      id: user.id,
-      roleId: user.roleId,
-    },
-    process.env.JWT_REFRESH_KEY,
-    { expiresIn: "365d" }
-  );
-};
+// let refreshTokens = [];
+// let generateAccessToken = (user) => {
+//   return jwt.sign(
+//     {
+//       id: user.id,
+//       roleId: user.roleId,
+//     },
+//     process.env.JWT_ACCESS_KEY,
+//     { expiresIn: "30s" }
+//   );
+// };
+// let generateRefreshToken = (user) => {
+//   return jwt.sign(
+//     {
+//       id: user.id,
+//       roleId: user.roleId,
+//     },
+//     process.env.JWT_REFRESH_KEY,
+//     { expiresIn: "365d" }
+//   );
+// };
 let handleUserLogin = (email, password) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -41,7 +41,7 @@ let handleUserLogin = (email, password) => {
             "lastName",
             "id",
           ],
-          where: { email: email },
+          where: { email: email, isActive: 0 },
           raw: true,
         });
         if (user) {
@@ -53,12 +53,12 @@ let handleUserLogin = (email, password) => {
           if (check) {
             userData.errCode = 0;
             userData.errMessage = "OK";
-            let acc = generateAccessToken(user);
-            let refresh = generateRefreshToken(user);
-            userData.accessToken = acc;
-            userData.refreshToken = refresh;
-            generateRefreshToken(user);
-            refreshTokens.push(acc);
+            // let acc = generateAccessToken(user);
+            // let refresh = generateRefreshToken(user);
+            // userData.accessToken = acc;
+            // userData.refreshToken = refresh;
+            // generateRefreshToken(user);
+            // refreshTokens.push(acc);
             // resolve(function (req, res) {
             //   return res.cookie("refresherToken", refresh, {
             //     httpOnly: true,

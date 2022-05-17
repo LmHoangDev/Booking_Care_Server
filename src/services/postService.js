@@ -68,36 +68,22 @@ let postCreateNewPostService = (data) => {
     }
   });
 };
-let postDeletePostService = (data) => {
+let postDeletePostService = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (_.isEmpty(data)) {
+      if (!id) {
         resolve({
           errCode: 1,
           errMessage: "Missing required parameter",
         });
       } else {
-        let id = +data.id;
-        let post = await db.Post.findOne({
-          where: {
-            id: id,
-          },
+        let data = await db.Post.findOne({
+          where: { id: id },
+          raw: false,
         });
-        // if (data) {
-        //   data.isDeleted = true;
-        //   await data.save();
-        //   resolve({
-        //     errCode: 0,
-        //     errMessage: "Delete clinic successfully",
-        //   });
-        // } else {
-        //   resolve({
-        //     errCode: 2,
-        //     errMessage: "Not found Clinic",
-        //   });
-        // }
-        if (post) {
-          await db.Post.update({ isDeleted: true }, { where: { id } });
+        if (data) {
+          data.isDeleted = true;
+          await data.save();
           resolve({
             errCode: 0,
             errMessage: "Delete post successfully",
