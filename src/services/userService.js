@@ -322,6 +322,45 @@ let changeActiveAccount = (data) => {
     }
   });
 };
+
+let changePasswordService = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.id) {
+        resolve({ errCode: 2, errMessage: "Missing required parameter" });
+      }
+      let user = await db.User.findOne({
+        where: { id: data.id },
+        raw: false,
+      });
+      console.log("user cpass", user);
+      if (user) {
+        // let isActive = data.isActive;
+        let check = await bcrypt.compare(data.password, user.password);
+
+        if (!check) {
+          resolve({
+            errCode: 3,
+            errMessage: "Mật khẩu không chính xác!",
+          });
+        } else {
+          let newPassword = await hashUserPassword(data.newPassword);
+          user.password = newPassword;
+          await user.save();
+          resolve({
+            errCode: 0,
+            errMessage: "Thay đổi mật khẩu thành công!",
+          });
+        }
+      } else {
+        resolve({ errCode: 1, errMessage: "The user not found" });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin: handleUserLogin,
   checkUserEmail: checkUserEmail,
@@ -333,5 +372,6 @@ module.exports = {
   refresherToken,
   userLogout,
   changeActiveAccount,
+  changePasswordService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js

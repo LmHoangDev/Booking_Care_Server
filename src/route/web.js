@@ -128,6 +128,8 @@ let initWebRouters = (app) => {
 
   // vo hieu hoa tai khoan hoac mo tai khoan
   router.post("/api/auth/activeAccount", userController.activeAccount);
+  // change password
+  router.post("/api/auth/changePassword", userController.changePassword);
 
   return app.use("/", router);
 };
