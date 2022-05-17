@@ -9,14 +9,14 @@ let getAllPostService = () => {
         raw: true,
         nest: true,
         where: {
-          isDeleted: false,
+          isDeleted: 0,
         },
       });
 
       if (data && data.length > 0) {
-        data = data.map((item, index) => {
+        data = data.filter((item, index) => {
           item.image = Buffer.from(item.image, "base64").toString("binary");
-          return item;
+          return item.isDeleted === 0 && item;
         });
         resolve({
           errCode: 0,
@@ -37,12 +37,13 @@ let getAllPostService = () => {
 let postCreateNewPostService = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
+      // console.log("Data", data);
       if (
         !data.title ||
         !data.type ||
         !data.descriptionHTML ||
         !data.descriptionMarkdown ||
-        !data.imageBase64
+        !data.image
       ) {
         resolve({
           errCode: 1,
@@ -54,7 +55,8 @@ let postCreateNewPostService = (data) => {
           type: data.type,
           descriptionHTML: data.descriptionHTML,
           descriptionMarkdown: data.descriptionMarkdown,
-          image: data.imageBase64,
+          image: data.image,
+          isDeleted: 0,
         });
         resolve({
           errCode: 0,
@@ -81,6 +83,19 @@ let postDeletePostService = (data) => {
             id: id,
           },
         });
+        // if (data) {
+        //   data.isDeleted = true;
+        //   await data.save();
+        //   resolve({
+        //     errCode: 0,
+        //     errMessage: "Delete clinic successfully",
+        //   });
+        // } else {
+        //   resolve({
+        //     errCode: 2,
+        //     errMessage: "Not found Clinic",
+        //   });
+        // }
         if (post) {
           await db.Post.update({ isDeleted: true }, { where: { id } });
           resolve({
