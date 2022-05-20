@@ -112,6 +112,8 @@ let initWebRouters = (app) => {
   router.post("/api/delete-post-by-id", postController.deletePostById);
   router.post("/api/update-post", postController.updatePostById);
 
+  router.get("/api/get-details-post-by-id", postController.getDetailPostById);
+
   //authController
 
   router.post("/api/auth/register", authController.registerUser);
@@ -130,6 +132,8 @@ let initWebRouters = (app) => {
   router.post("/api/auth/activeAccount", userController.activeAccount);
   // change password
   router.post("/api/auth/changePassword", userController.changePassword);
+  //change infor-user
+  router.post("/api/auth/changeInforUser", userController.changeInforUser);
 
   return app.use("/", router);
 };

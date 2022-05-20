@@ -31,9 +31,19 @@ let updatePostById = async (req, res) => {
     console.log(error);
   }
 };
+
+let getDetailPostById = async (req, res) => {
+  try {
+    let response = await postService.getDetailPostByIdService(+req.query.id);
+    return res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   getAllPost,
   createNewPost,
   deletePostById,
   updatePostById,
+  getDetailPostById,
 };

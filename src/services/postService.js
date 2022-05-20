@@ -151,10 +151,41 @@ let updatePostService = (data) => {
     }
   });
 };
-
+let getDetailPostByIdService = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!id) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        let data = await db.Post.findOne({
+          where: { id: id, isDeleted: 0 },
+        });
+        if (data) {
+          data.image = Buffer.from(data.image, "base64").toString("binary");
+          resolve({
+            errCode: 0,
+            errMessage: "OK",
+            data,
+          });
+        }
+        resolve({
+          errCode: 0,
+          errMessage: "OK",
+          data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   getAllPostService,
   postCreateNewPostService,
   postDeletePostService,
   updatePostService,
+  getDetailPostByIdService,
 };

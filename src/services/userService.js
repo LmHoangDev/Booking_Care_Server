@@ -360,7 +360,35 @@ let changePasswordService = (data) => {
     }
   });
 };
+let changeInforUserService = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.id || !data.gender || !data.address || !data.phoneNumber) {
+        resolve({ errCode: 2, errMessage: "Missing required parameter" });
+      } else {
+        let user = await db.User.findOne({
+          where: { id: data.id },
+          raw: false,
+        });
+        if (user) {
+          user.address = data.address;
+          user.gender = data.gender;
+          user.phoneNumber = data.phoneNumber;
 
+          await user.save();
+          resolve({
+            errCode: 0,
+            errMessage: "Thay đổi thông tin thành công!",
+          });
+        } else {
+          resolve({ errCode: 1, errMessage: "The user not found" });
+        }
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 module.exports = {
   handleUserLogin: handleUserLogin,
   checkUserEmail: checkUserEmail,
@@ -373,5 +401,6 @@ module.exports = {
   userLogout,
   changeActiveAccount,
   changePasswordService,
+  changeInforUserService,
 };
 // npx sequelize-cli db:migrate --to 20220308032240-create-user.js

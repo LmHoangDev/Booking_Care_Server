@@ -459,6 +459,7 @@ let getListPatientsForDoctorService = (doctorId, date) => {
           raw: false,
           nest: true,
         });
+        // console.log("data", data);
         resolve({
           errCode: 0,
           errMessage: "Ok",

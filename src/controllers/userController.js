@@ -102,6 +102,19 @@ let changePassword = async (req, res) => {
     });
   }
 };
+
+let changeInforUser = async (req, res) => {
+  try {
+    let response = await userService.changeInforUserService(req.body);
+    // console.log(response);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server ...",
+    });
+  }
+};
 module.exports = {
   handleLogin: handleLogin,
   handleGetAllUsers,
@@ -113,4 +126,5 @@ module.exports = {
   refreshToken,
   activeAccount,
   changePassword,
+  changeInforUser,
 };
